@@ -106,8 +106,5 @@ secrets/
 *.key
 credentials.json
 
-# Test files
-test_*.py
-test_data_download.py
-test_preprocessing.py
-test_model.py
+# Ignore test helper scripts in root only (not tests/ directory)
+/test_*.py
