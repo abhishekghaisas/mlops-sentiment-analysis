@@ -1,0 +1,59 @@
+# MLOps Sentiment Analysis Configuration
+
+# Data settings
+data:
+  dataset_name: "imdb"
+  train_size: 0.8
+  test_size: 0.2
+  random_state: 42
+  max_features: 5000
+  max_len: 200
+
+# Model settings
+model:
+  type: "logistic_regression"
+  params:
+    C: 1.0
+    max_iter: 1000
+    solver: "lbfgs"
+  
+# Feature engineering
+features:
+  vectorizer: "tfidf"
+  ngram_range: [1, 2]
+  min_df: 5
+  max_df: 0.8
+
+# Training settings
+training:
+  batch_size: 32
+  epochs: 10
+  learning_rate: 0.001
+  early_stopping: true
+  patience: 3
+
+# MLflow settings
+mlflow:
+  experiment_name: "sentiment-analysis"
+  tracking_uri: "file:./mlruns"
+  artifact_location: "./mlartifacts"
+
+# Model performance thresholds
+thresholds:
+  min_accuracy: 0.85
+  min_f1_score: 0.83
+  max_inference_time_ms: 200
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/mlops.log"
+
+# Paths
+paths:
+  data_dir: "data"
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  models_dir: "models/trained"
+  logs_dir: "logs"

@@ -1,0 +1,113 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments - CRITICAL
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# Data - CRITICAL
+data/raw/*.csv
+data/raw/*.txt
+data/raw/*.json
+data/raw/*.tar.gz
+data/raw/aclImdb/
+data/raw/aclImdb_v1/
+data/processed/*.csv
+data/processed/*.parquet
+
+# Models - CRITICAL
+models/trained/*.pkl
+models/trained/*.h5
+models/trained/*.pth
+models/trained/*.onnx
+*.pkl
+*.h5
+*.pth
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Logs
+logs/
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# DVC
+.dvc/config.local
+.dvc/tmp
+.dvc/cache
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Kubernetes
+*.kubeconfig
+
+# Secrets
+secrets/
+*.pem
+*.key
+credentials.json
+
+# Test files
+test_*.py
+test_data_download.py
+test_preprocessing.py
+test_model.py
