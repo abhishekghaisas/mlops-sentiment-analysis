@@ -1,0 +1,158 @@
+# Blue-Green Deployment Strategy for Zero-Downtime Updates
+
+# Blue Deployment (Current/Stable Version)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentiment-api-blue
+  namespace: mlops
+  labels:
+    app: sentiment-api
+    version: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sentiment-api
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: sentiment-api
+        version: blue
+    spec:
+      containers:
+      - name: api
+        image: sentiment-api:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: DEPLOYMENT_VERSION
+          value: "blue"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+# Green Deployment (New Version - Initially 0 replicas)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentiment-api-green
+  namespace: mlops
+  labels:
+    app: sentiment-api
+    version: green
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: sentiment-api
+      version: green
+  template:
+    metadata:
+      labels:
+        app: sentiment-api
+        version: green
+    spec:
+      containers:
+      - name: api
+        image: sentiment-api:v1.1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: DEPLOYMENT_VERSION
+          value: "green"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+# Main Service - Routes to active version
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentiment-api-service
+  namespace: mlops
+  labels:
+    app: sentiment-api
+spec:
+  type: NodePort
+  selector:
+    app: sentiment-api
+    version: blue  # Initially points to blue
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+    name: http
+---
+# Blue Service (for testing blue deployment)
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentiment-api-blue-service
+  namespace: mlops
+spec:
+  type: ClusterIP
+  selector:
+    app: sentiment-api
+    version: blue
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+# Green Service (for testing green before switching)
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentiment-api-green-service
+  namespace: mlops
+spec:
+  type: ClusterIP
+  selector:
+    app: sentiment-api
+    version: green
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
