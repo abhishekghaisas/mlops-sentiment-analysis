@@ -7,10 +7,9 @@ from typing import Dict, List
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 from prometheus_client import Counter, Histogram, generate_latest
-from fastapi.responses import Response
 
 from src.data.preprocess import TextPreprocessor
 
@@ -76,6 +75,8 @@ class HealthResponse(BaseModel):
     status: str
     model_loaded: bool
     version: str
+    
+    model_config = {"protected_namespaces": ()}
 
 
 def load_model():
@@ -115,20 +116,16 @@ async def startup_event():
     load_model()
 
 
-@app.get("/", response_model=Dict[str, str])
+@app.get("/")
 async def root():
     """Root endpoint."""
     REQUEST_COUNTER.labels(method='GET', endpoint='/', status='200').inc()
     return {
         "message": "Sentiment Analysis API",
         "version": "1.0.0",
-        "endpoints": {
-            "health": "/health",
-            "predict": "/predict",
-            "batch_predict": "/batch_predict",
-            "metrics": "/metrics",
-            "docs": "/docs"
-        }
+        "health": "/health",
+        "predict": "/predict", 
+        "docs": "/docs"
     }
 
 
@@ -220,7 +217,6 @@ async def batch_predict(request: BatchPredictionRequest):
         predictions = []
         
         for text in request.texts:
-            # Create individual prediction request
             pred_request = PredictionRequest(text=text)
             pred_response = await predict(pred_request)
             predictions.append(pred_response)
